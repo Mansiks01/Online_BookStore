@@ -1,0 +1,63 @@
+{% extends "books/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="alert alert-primary alert-dismissible fade show" role="alert">
+    <strong>Welcome,</strong> {{ request.user }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<br><br>
+
+<div>
+    <h2 style="color: black; text-align: center">{{ category.name }}</h2>
+    <div class="container">
+        <div class="row justify-content-right">
+            {% for book in books %}
+            <div class="col-md-3">
+                <div class="card" style="width: 18rem;">
+                    <img src="{% static 'books/image/default.jpg' %}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ book.title }}</h5>
+                        <p class="card-text">Rs. {{ book.price }}</p>                                
+                        <hr>
+                        <a href="{% url 'details' slug=book.slug %}" style="float:left" class="btn btn-primary"><i class="fa-solid fa-circle-info"></i>Details</a>
+                        <a href="#" class="btn btn-secondary add-to-cart" data-book-id="{{ book.id }}" style="float:right">
+                            <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+                        </a>                            
+                    </div>
+                    
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center mt-4">
+        <ul class="pagination">
+            {% if books.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1">First</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ books.previous_page_number }}">Previous</a>
+            </li>
+            {% endif %}
+            
+            <li class="page-item active">
+                <span class="page-link">{{ books.number }}</span>
+            </li>
+            
+            {% if books.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ books.next_page_number }}">Next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ books.paginator.num_pages }}">Last</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+
+{% endblock content %}

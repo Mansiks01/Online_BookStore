@@ -1,0 +1,23 @@
+{% extends "books/base.html" %}
+{% load static %}
+
+{% block title %}Cart{% endblock title %}
+{% block content %}
+
+<div class="justify-content-center">
+{% for books in cart_items %}
+<div class="card col-md-4 mb-4 msg" style="width: 30rem; display: flex; flex-direction: row; justify-content: center; align-items: center; margin-right: 10px;">
+             
+    <img src="{% static 'books/image/default.jpg' %}" class="card-img-top" alt="..." style="height: 100%; width: 50%;">
+    <div class="card-body" style="flex-grow: 1;">
+        <h5 class="card-title">{{books}}</h5>
+        <p class="card-text" style="float:left">quantity</p>
+        <p class="card-text" style="float:right">{{ books.product.price }}</p>        
+    </div>
+</div>  
+<hr>
+{% endfor %}
+</div>
+
+{% endblock content %}
+

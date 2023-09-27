@@ -1,0 +1,41 @@
+{% extends 'books/base.html' %}
+{% block title %}Edit Page{% endblock title %}
+{% block content %}
+<style>
+    div {
+        text-align: center;
+    }
+
+    .container-form {
+        border: 1px solid;
+    }
+</style>
+
+<div class="container mt-5">
+    <form class="col-6 mx-auto card p-3 shadow-lg" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <h1 class="text-center">Edit Page</h1>
+        <div class="input-group mb-3">
+            <span class="input-group-text">@Username</span>
+            <input type="text" class="form-control" placeholder="{{ user.username }}" aria-label="Username" aria-describedby="basic-addon1" name="user_name" required>
+        </div>
+
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="{{ user.first_name }}" aria-label="First Name" name="first_name">
+
+            <span class="input-group-text">@first_name/last_name</span>
+            <input type="text" class="form-control" placeholder="{{ user.last_name }}" aria-label="Last Name" name="last_name">
+
+        </div>
+
+        <div class="input-group mb-3">
+            <span class="input-group-text">e-mail</span>
+            <input type="email" class="form-control" placeholder="{{ user.email }}" aria-label="Email" aria-describedby="basic-addon1" name="email">
+
+        </div>
+
+        <button type="submit" class="btn btn-outline-secondary">Submit</button>
+    </form>
+</div>
+
+{% endblock content %}
