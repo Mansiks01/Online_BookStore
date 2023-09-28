@@ -1,12 +1,29 @@
 {% extends "books/base.html" %}
 {% load static %}
 
+{% block css %}
+<link rel="stylesheet" href="{% static "books/styles/profile.css" %}">
+{% endblock css %}
+
 {% block content %}
 {% for user in profile_detail %}
 <div class="container mt-5">
     <div class="d-flex justify-content-center"> 
         <form class="col-6 card p-3 shadow-lg" method="post" enctype="multipart/form-data">
             {% csrf_token %}
+            {% if user.image %}
+            <img src="{% static 'books/image/default.jpg' %}" class="card-img-top" alt="...">
+            {% else %}
+            <div class="circle-container">
+                <div class="circle-image">
+                    <img src="{% static 'books/image/default_user.png' %}" class="card-img-top" alt="...">
+                </div>
+            </div>
+            
+            
+            
+            {% endif %}
+            <div class="d-flex justify-content-right"> 
             <table class="table">
                 <tbody>
                     <tr>
@@ -27,6 +44,7 @@
                     </tr>
                 </tbody>
             </table>
+            </div>
             <a href="{% url 'update_profile' user.0 %}" class="btn btn-primary" type="submit">Edit</a>
         </form>
     </div>

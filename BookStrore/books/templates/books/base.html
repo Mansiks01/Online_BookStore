@@ -15,39 +15,40 @@
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
-              <a class="navbar-brand" href="/home/">Logo</a>              
+              <a class="navbar-brand" href="/home/">Logo</a>  
+            {% if  request.user.is_authenticated %}            
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item dropdown dropdown-hover">
                         <a class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Categories
+                            Sort By
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#">Type1</a></li>
-                            <li><a class="dropdown-item" href="#">Type2</a></li>
-                            <li><a class="dropdown-item" href="#">Type3</a></li>
+                            <li><a class="dropdown-item" href="#">Author</a></li>
+                            <li><a class="dropdown-item" href="#">Category</a></li>
+                            <li><a class="dropdown-item" href="#">Price</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown dropdown-hover" >
                         <a class="nav-link dropdown-toggle " href="#"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Language
+                            Order by 
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#">Type1</a></li>
-                            <li><a class="dropdown-item" href="#">Type2</a></li>
-                            <li><a class="dropdown-item" href="#">Type3</a></li>
+                            <li><a class="dropdown-item" href="#">Accending</a></li>
+                            <li><a class="dropdown-item" href="#">Descending</a></li>
+                            
                         </ul>
                     </li>
                      
                        
-                {% if  request.user.is_authenticated %}
+                
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       Settings
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                       <li><a class="dropdown-item" href="{% url 'profile' slug=request.user %}">Profile</a></li>
-                      <li><a class="dropdown-item" href="#">Change Password</a></li>
+                      <li><a class="dropdown-item" href="/forget_password/">Change Password</a></li>
                       <li><hr class="dropdown-divider"></li>
                       <li><a class="dropdown-item" href="/logout/">Logout</a></li>
                     </ul>
@@ -57,20 +58,15 @@
                 </li>
             </ul>                
                 </div class="col-md-4 col-sm-5 col-xs-2">
-                <form class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
+                <form class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4" role="search">
+                    <input class="form-control me-2" name="search" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success mt-auto" type="submit">Go</button>
+                  </form>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
                 </button>
-            </div>
-        
-                
-               
-                {% endif %}        
-                  
-             
+            </div> 
+            {% endif %}    
         </nav>
         {% block content %}
         

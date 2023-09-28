@@ -1,6 +1,8 @@
+from . import views
 from django.urls import path
 from django.contrib.auth.decorators import login_required
-from . import views
+
+
 
 
 urlpatterns = [
@@ -16,4 +18,6 @@ urlpatterns = [
     path('cart/',views.cart,name="cart"),
     path('forget_password/',views.forget_password,name='forget_password'),
     path('change_password/<token>/',views.change_password,name='change_password'),
+    path('remove_cart/<int:cart_item_id>',views.remove_cart,name='remove_cart'),
+    # path('search/', views.search_results, name='search_results'),
 ]

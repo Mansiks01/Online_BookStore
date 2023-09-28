@@ -17,6 +17,7 @@ class Book(models.Model):
     slug = models.SlugField(unique=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)  
     description = models.TextField(blank=True, null=True) 
+    book_image = models.ImageField(upload_to='Book_image/', null=True, blank=True)
     
 
     def __str__(self):
@@ -26,8 +27,7 @@ class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     is_paid = models.BooleanField(default=False)
     
-    # def get_cart_count(self):
-    #     return Cartitems.objects.filter(Cart__is_paid = False,Cart__user = self.user).count()
+   
     
     def __str__(self):
         return str(self.user)
@@ -35,7 +35,11 @@ class Cart(models.Model):
 class Cartitems(models.Model):
     cart = models.ForeignKey(Cart,on_delete=models.CASCADE,related_name="cart")
     product = models.ForeignKey(Book,on_delete=models.SET_NULL,null=True,blank=True)
+    quantity = models.PositiveIntegerField(default=1)
 
+    # def get_product_price(self):
+    #     price = [self.product.price]
+        
     def __str__(self):
         return str(self.product)
 

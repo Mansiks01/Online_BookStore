@@ -7,12 +7,14 @@ from .models import Category, Book,Profile,Cart, Cartitems
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 import uuid
+from django.db.models import Sum,F
 from .helpers import send_forget_password_mail
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect,HttpResponse
 from django.utils import timezone
 from datetime import timedelta
 import mysql.connector
 import re
+from django.db.models import Q
 
 path = 'my.cnf'
 # Create your views here.
@@ -53,11 +55,9 @@ def login_page(request):
 
 def log_out(request):
     logout(request)
-
     response = redirect('/')
     response.delete_cookie('remembered_username')
-    response.delete_cookie('remembered_password')
-    
+    response.delete_cookie('remembered_password')    
     return response
     
 
@@ -97,10 +97,13 @@ def home(request):
     categories = Category.objects.all()
     books_by_category = {}
     
-    
+    search = request.GET.get('search')        
 
     for category in categories:
         books = Book.objects.filter(category=category)[:4]
+        if search:
+            books = Book.objects.filter(
+            Q(title__icontains=search) | Q(author__icontains=search), category=category) 
         books_by_category[category] = books
     
     return render(request, 'books/home.html', {'books_by_category': books_by_category})
@@ -180,43 +183,22 @@ def category_books(request, category_slug):
 
 
 
-# views.py
-from django.http import JsonResponse
+def add_to_cart(request, id):
+    book = get_object_or_404(Book, id=id)
+    quantity = int(request.POST.get('quantity', 1))     
+    cart, created = Cart.objects.get_or_create(user=request.user)    
+    cart_item, created = Cartitems.objects.get_or_create(cart=cart, product=book)
+    if not created:
+        cart_item.quantity += quantity
+        cart_item.save()
 
-def add_to_cart(request):
-    if request.method == 'POST':
-        book_id = request.POST.get('book_id')
-        action = request.POST.get('action')
-        quantity = int(request.POST.get('quantity', 1))  # Default to 1 if quantity is not provided
+    messages.success(request, f'Added {quantity} item(s) of {book.title} to your cart.')
+    cart_item.save()
+    
+    return redirect('cart')
+   
 
-        # Get the book and user
-        book = Book.objects.get(id=book_id)
-        user = request.user
-
-        # Check if a cart for the user exists, if not, create one
-        cart, created = Cart.objects.get_or_create(user=user, is_paid=False)
-
-        if action == 'plus':
-            # Check if the book is already in the cart
-            cart_item, created = Cartitems.objects.get_or_create(cart=cart, product=book)
-            
-            # Update the quantity of the book in the cart
-            cart_item.quantity += quantity
-            cart_item.save()
-        elif action == 'minus':
-            # Get the cart item for the book
-            cart_item = Cartitems.objects.get(cart=cart, product=book)
-            
-            # Reduce the quantity if it's greater than 0
-            if cart_item.quantity > 0:
-                cart_item.quantity -= quantity
-                cart_item.save()
-        
-        return JsonResponse({'message': 'Book added to cart successfully'})
-
-    return JsonResponse({'message': 'Invalid request'}, status=400)
-
-    # return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    
 
 
 
@@ -265,11 +247,9 @@ def forget_password(request):
             username = request.POST.get('username')
             if not User.objects.filter(username=username).first():
                 messages.error(request, 'User not found')
-                return redirect('/forget_password/')
+                return redirect('/forget_password/')         
             
-            
-            user_obj = User.objects.get(username=username)
-            
+            user_obj = User.objects.get(username=username)         
             
             profile_obj = Profile.objects.get(user=user_obj)
            
@@ -286,11 +266,84 @@ def forget_password(request):
     return render(request, 'books/forget_password.html')
 
 
-def cart(request):
-     
+def cart(request): 
+    
     user = request.user
+    cart = Cart.objects.get(user=user)
     cart_items = Cartitems.objects.filter(cart__is_paid = False,cart__user = user) 
+    quantity = cart_items
+    total_price = cart_items.aggregate(total_price=Sum(F('product__price') * F('quantity')))['total_price']
 
+    if request.method == 'POST':            
+                # Update cart items, set is_paid to True
+                cart.is_paid=True
+
+                # Decrease the available quantity of books
+                for cart_item in cart_items:
+                    book = cart_item.product
+                    book.available_quantity -= 1
+                    book.save()
+            # Clear the cart
+                cart_items.delete()
+
+                messages.success(request, 'Payment successful. Your order has been placed.')
+                return redirect('/home/')
        
-    # details = Book.objects.filter(title=cart_items)
-    return render(request,'books/cart.html',{'cart_items':cart_items})
+    
+    return render(request,'books/cart.html',{'cart_items':cart_items,'total_price': total_price})
+
+
+def remove_cart(request, cart_item_id):
+    try : 
+        cart_item = Cartitems.objects.get(id = cart_item_id)
+        cart_item.delete()
+
+    except Exception as e:
+        print(e)    
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required(login_url='/')
+def make_payment(request):    
+        try:
+            user = request.user
+            cart_items = Cartitems.objects.filter(cart__is_paid=False, cart__user=user)
+    # total_price = cart_items.aggregate(total_price=Sum('product__price'))['total_price']
+
+            if request.method == 'POST':
+            
+                # Update cart items, set is_paid to True
+                cart_items.update(cart__is_paid=True)
+
+                # Decrease the available quantity of books
+                for cart_item in cart_items:
+                    book = cart_item.product
+                    book.available_quantity -= 1
+                    book.save()
+
+            # Clear the cart
+                cart_items.delete()
+
+                messages.success(request, 'Payment successful. Your order has been placed.')
+                return redirect('/home/')
+
+        except Exception as e:
+            messages.error(request, 'Payment failed. Please try again.')
+            return HttpResponse('Erro')
+
+    # return render(request, 'books/make_payment.html', {'total_price': total_price})
+
+
+# def search_results(request):
+#     query = request.GET.get('q')
+#     category = request.GET.get('category')
+#     results = []
+#     if query:
+#         book_query = Q(title__icontains=query) | Q(author__icontains=query)
+        
+#         if category:
+#             book_query &= Q(category__genre__icontains=category)
+
+#         results = Book.objects.filter(book_query)
+
+#     return render(request, 'books/search_results.html', {'results': results})
