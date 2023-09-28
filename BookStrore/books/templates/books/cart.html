@@ -3,32 +3,29 @@
 
 {% block title %}Cart{% endblock title %}
 {% block content %}
-
 {% if messages %}
-{{ message.tags }}
-<div class="alert alert-info" role="alert">
-    {% for message in messages %}
-    {{ message }}
-    {% endfor %}
-  </div>
- 
-{% endif %}
-
-<div class="justify-content-center">
-{% for books in cart_items %}
-<div class="card col-md-4 mb-4 msg" style="width: 30rem; display: flex; flex-direction: row; justify-content: center; align-items: center; margin-right: 10px;">
-             
-    <img src="{% static 'books/image/default.jpg' %}" class="card-img-top" alt="..." style="height: 100%; width: 50%;">
-    <div class="card-body" style="flex-grow: 1;">
-        <h5 class="card-title">{{books}}</h5>
-        <p class="card-text" style="float:left">{{ books.quantity }}</p>
-        <p class="card-text" style="float:right">{{ books.product.price }}</p><br>
-        <hr>
-        <a class="btn btn-danger " type="button" href='{% url "remove_cart" cart_item_id=books.id %}'><i class="fa-solid fa-trash"></i></i>Delete</a>        
+    {{ message.tags }}
+    <!-- Display info messages -->
+    <div class="alert alert-info" role="alert">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
     </div>
-</div>  
-<hr>
-{% endfor %}
+{% endif %}
+<div class="justify-content-center">
+    {% for books in cart_items %}
+    <div class="card col-md-4 mb-4 msg" style="width: 30rem; display: flex; flex-direction: row; justify-content: center; align-items: center; margin-right: 10px;">
+        <img src="{% static 'books/image/default.jpg' %}" class="card-img-top" alt="..." style="height: 100%; width: 50%;">
+        <div class="card-body" style="flex-grow: 1;">
+            <h5 class="card-title">{{ books }}</h5>
+            <p class="card-text" style="float:left">{{ books.quantity }}</p>
+            <p class="card-text" style="float:right">{{ books.product.price }}</p><br>
+            <hr>
+            <a class="btn btn-danger " type="button" href='{% url "remove_cart" cart_item_id=books.id %}'><i class="fa-solid fa-trash"></i>Delete</a>        
+        </div>
+    </div>  
+    <hr>
+    {% endfor %}
 </div>
 <table class="table">
     <thead>
@@ -42,6 +39,4 @@
     {% csrf_token %}
     <button class="btn btn-success" type="submit"><i class="fa-solid fa-money-bill-trend-up"></i>Make payment</button>
 </form>
-
 {% endblock content %}
-

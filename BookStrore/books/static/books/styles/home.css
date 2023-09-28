@@ -1,0 +1,5 @@
+.book-card {
+    border: 1px solid #000000; /* Define the border style */
+    padding: 10px; /* Add padding to create some space between the border and content */
+    margin-bottom: 20px; /* Add margin to separate each book card */
+}

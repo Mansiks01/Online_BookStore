@@ -1,64 +1,56 @@
 {% extends 'books/base.html' %}
-{% block title %}login page{% endblock title %}
+{% block title %}Register Page{% endblock title %}
 {% block content %}
 <style>
+    /* Center align text and add styles for .container-form if needed */
     div {
-        align:center;
+        text-align: center;
     }
 
-    
-    .container-form {        
+    .container-form {
         border: 1px solid;
-
     }
-   
 </style>
 
 <div class="container mt-5">    
-    
-    <form class="col-6 mx-auto card p-3 shadow-lg" method="post" enctype="multipart/form-data" >
+    <form class="col-6 mx-auto card p-3 shadow-lg" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <h1 align="center"> Register Page !!!!</h1>
-        
+        <h1 align="center">Register Page!!!</h1>
+
         {% if messages %}
         {{ message.tags }}
         <div class="alert alert-info" role="alert">
             {% for message in messages %}
             {{ message }}
             {% endfor %}
-          </div>
-         
+        </div>
         {% endif %}
         
-        
-        
-        
         <div class="input-group mb-3">
             <span class="input-group-text">@</span>
-            <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" name="user_name" required>
+            <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" name="username" required>
         </div>
         
         <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="First Name" aria-label="Username" name='first_name' required>
+            <input type="text" class="form-control" placeholder="First Name" aria-label="First Name" name="first_name" required>
             <span class="input-group-text">@</span>
-            <input type="text" class="form-control" placeholder="Last Name" aria-label="Server" name='last_name'>
-          </div>
-        
+            <input type="text" class="form-control" placeholder="Last Name" aria-label="Last Name" name="last_name">
+        </div>
 
         <div class="input-group mb-3">
-            <span class="input-group-text">e-mail</span>
+            <span class="input-group-text">Email</span>
             <input type="email" class="form-control" placeholder="abc@gmail.com" aria-label="Email" aria-describedby="basic-addon1" name="email" required>
         </div>
+        
         <label for="inputPassword5" class="form-label">Password</label>
         <input type="password" id="inputPassword5" class="form-control" aria-labelledby="passwordHelpBlock" name="password" required>
         <div id="passwordHelpBlock" class="form-text">
             Your password must be 8-20 characters long, contain letters and numbers, and must not contain spaces, special characters, or emoji.
         </div><br>
-        <a href="/" style="text-align:center" >Already Have an Account ?</a>
-        <button type="submit" class="btn btn-outline-secondary" >Register</button>
+        
+        <a href="/" style="text-align:center">Already Have an Account?</a>
+        <button type="submit" class="btn btn-outline-secondary">Register</button>
     </form>
-  
 </div>
-
 
 {% endblock content %}

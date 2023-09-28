@@ -1,45 +1,52 @@
 {% extends "books/base.html" %}
 {% load static %}
-
+{% block css %}
+<link rel="stylesheet" href="{% static "books/styles/home.css" %}">
+{% endblock css %}
 {% block content %}
 {% if messages %}
-        {{ message.tags }}
-        <div class="alert alert-info" role="alert">
-            {% for message in messages %}
-            {{ message }}
-            {% endfor %}
-          </div>
-        {% else %} 
-        <div class="alert alert-primary alert-dismissible fade show" role="alert">
-            <strong>Welcome,</strong> {{ request.user }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        <br><br>
-        
+    {{ message.tags }}
+    <!-- Display info messages -->
+    <div class="alert alert-info" role="alert">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+    </div>
+{% else %}
+    <!-- Display a welcome message for authenticated users -->
+    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+        <strong>Welcome,</strong> {{ request.user }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <br><br>
 {% endif %}
 
 {% for genre, books in books_by_category.items %}
 <div>    
     <h2 style="color: black; text-align: center">{{ genre }}</h2>
+    <!-- Link to see all books in the category -->
     <a href="{% url 'category_books' category_slug=genre|slugify %}" class="btn btn-primary float-right"><i class="fa-solid fa-eye"></i> See All</a>
     
+    <!-- Carousel for displaying books -->
     <div id="carouselExampleControls_{{ genre }}" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
             <div class="container">
                 <div class="row justify-content-right">
                     {% for book in books %}
-                        <div class="col-md-3 col-xs-1 col-sm-6">
-                            <div class="card" style="width: 18rem;height: 30rem;position: relative;">
+                        <div class="col-md-3 col-xs-1 col-sm-6 ">
+                            <div class="card book-card" style="width: 18rem;height:33rem;position: relative;">
                                 {% if book.available_quantity == 0 %}
+                                    <!-- Display "Limited Stock" for books with zero quantity -->
                                     <button class="btn btn-warning btn-limited-stock" style="position: absolute; top: 0; right: 0;">Limited Stock</button>
                                 {% elif book.available_quantity < 15 %}
-                                <button class="btn btn-warning btn-limited-stock" style="position: absolute; top: 0; right: 0;">Limited Stock</button>
+                                    <!-- Display "Limited Stock" for books with low quantity -->
+                                    <button class="btn btn-warning btn-limited-stock" style="position: absolute; top: 0; right: 0;">Limited Stock</button>
                                 {% endif %}
 
                                 {% if book.book_image %}
                                     <img src="{{ book.book_image.url }}" class="card-img-top" alt="..." style="height:15rem">
                                 {% else %}
-                                <img src="{% static 'books/image/default.jpg' %}" class="card-img-top" alt="...">
+                                    <img src="{% static 'books/image/default.jpg' %}" class="card-img-top" alt="...">
                                 {% endif %}
                                 
                                 <div class="card-body">
@@ -49,20 +56,23 @@
 
                                     {% if book.available_quantity > 0 %}
                                         <hr>
-                                        <a href="{% url 'details' slug=book.slug %}" style="float:left" class="btn btn-primary"><i class="fa-solid fa-circle-info"></i>Details</a>
+                                        <!-- Link to book details -->
+                                        <a href="{% url 'details' slug=book.slug %}" style="float:left" class="btn btn-primary"><i class="fa-solid fa-circle-info"></i> Details</a>
                                         
+                                        <!-- Form for adding to cart -->
                                         <form method="post" action="{% url 'add_to_cart' book.id %}">
                                             {% csrf_token %}
                                             <div class="justify-content-right">
                                                 <div class="input-group hidden-quantity-input " style="display: none; max-width: 9rem;">
-                                                    <button class="btn btn-primary minus-quantity" type="button"><i class="fa-solid fa-minus"></i></button>
+                                                    <button class="btn btn-outline-dark minus-quantity" type="button"><i class="fa-solid fa-minus"></i></button>
                                                     <input name='quantity' type="number" class="form-control quantity-input" value="1">
-                                                    <button class="btn btn-primary plus-quantity" type="button"><i class="fa-solid fa-plus"></i></button>
+                                                    <button class="btn btn-outline-dark plus-quantity" type="button"><i class="fa-solid fa-plus"></i></button>
                                                     <hr>
-                                                    <button class="btn btn-primary" type="submit"><i class="fa-solid fa-cart-shopping"></i>Add</button>
+                                                    <button class="btn btn-" type="submit"><i class="fa-solid fa-cart-shopping"></i> Add</button>
                                                 </div>
                                             </div>
                                         </form>
+                                        <!-- Button to add items to cart -->
                                         <a class="btn btn-secondary add-to-cart" data-book-id="{{ book.id }}" style="float:right;">
                                             Add <i class="fa-solid fa-plus"></i>
                                         </a>
@@ -79,63 +89,63 @@
 </div>
 {% endfor %}
 
-
+<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<!-- JavaScript for managing quantity input and buttons -->
 <script>
-    $(document).ready(function() {
-        // Listen for clicks on the visible "Add" button within each card
-        $('.add-to-cart').on('click', function(e) {
-            e.preventDefault();
-            
-            // Get the relevant card's hidden quantity input field and button
-            var hiddenInputContainer = $(this).closest('.card').find('.hidden-quantity-input');
-            
-            // Toggle the visibility of the hidden input field and buttons
-            hiddenInputContainer.toggle();
-            
-            // Toggle the visibility of the visible "Add" button
-            $(this).toggle();
-        });
+$(document).ready(function() {
+    // Listen for clicks on the visible "Add" button within each card
+    $('.add-to-cart').on('click', function(e) {
+        e.preventDefault();
         
-        // Handle the "+" and "-" buttons for quantity
-        $(document).on('click', '.plus-quantity', function() {
-            var quantityInput = $(this).closest('.hidden-quantity-input').find('.quantity-input');
-            var quantity = parseInt(quantityInput.val());
-            quantityInput.val(quantity + 1);
-            
-            // Show the "Add-Minus" button
-            $(this).closest('.hidden-quantity-input').find('.add-minus-cart').show();
-        });
+        // Get the relevant card's hidden quantity input field and button
+        var hiddenInputContainer = $(this).closest('.card').find('.hidden-quantity-input');
         
-        $(document).on('click', '.minus-quantity', function() {
-            var quantityInput = $(this).closest('.hidden-quantity-input').find('.quantity-input');
-            var quantity = parseInt(quantityInput.val());
-            if (quantity > 0) {
-                quantityInput.val(quantity - 1);
-            }
-            
-            // If the quantity becomes 0, hide the "Add-Minus" button and show the "Add" button
-            if (quantityInput.val() === '0') {
-                $(this).closest('.hidden-quantity-input').hide();
-                $(this).closest('.card').find('.add-to-cart').show();
-            }
-        });
+        // Toggle the visibility of the hidden input field and buttons
+        hiddenInputContainer.toggle();
         
-        // Listen for changes to the quantity input fields
-        $('.quantity-input').on('change', function() {
-            var quantity = parseInt($(this).val());
-            
-            // If the quantity is zero, hide the input field and show the "Add" button
-            if (quantity === 0) {
-                $(this).closest('.hidden-quantity-input').hide();
-                $(this).closest('.card').find('.add-to-cart').show();
-            } else {
-                $(this).closest('.card').find('.add-to-cart').hide();
-                $(this).closest('.hidden-quantity-input').find('.add-minus-cart').show();
-            }
-        });
+        // Toggle the visibility of the visible "Add" button
+        $(this).toggle();
     });
+    
+    // Handle the "+" and "-" buttons for quantity
+    $(document).on('click', '.plus-quantity', function() {
+        var quantityInput = $(this).closest('.hidden-quantity-input').find('.quantity-input');
+        var quantity = parseInt(quantityInput.val());
+        quantityInput.val(quantity + 1);
+        
+        // Show the "Add-Minus" button
+        $(this).closest('.hidden-quantity-input').find('.add-minus-cart').show();
+    });
+    
+    $(document).on('click', '.minus-quantity', function() {
+        var quantityInput = $(this).closest('.hidden-quantity-input').find('.quantity-input');
+        var quantity = parseInt(quantityInput.val());
+        if (quantity > 0) {
+            quantityInput.val(quantity - 1);
+        }
+        
+        // If the quantity becomes 0, hide the "Add-Minus" button and show the "Add" button
+        if (quantityInput.val() === '0') {
+            $(this).closest('.hidden-quantity-input').hide();
+            $(this).closest('.card').find('.add-to-cart').show();
+        }
+    });
+    
+    // Listen for changes to the quantity input fields
+    $('.quantity-input').on('change', function() {
+        var quantity = parseInt($(this).val());
+        
+        // If the quantity is zero, hide the input field and show the "Add" button
+        if (quantity === 0) {
+            $(this).closest('.hidden-quantity-input').hide();
+            $(this).closest('.card').find('.add-to-cart').show();
+        } else {
+            $(this).closest('.card').find('.add-to-cart').hide();
+            $(this).closest('.hidden-quantity-input').find('.add-minus-cart').show();
+        }
+    });
+});
 </script>
-
 {% endblock content %}

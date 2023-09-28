@@ -19,36 +19,34 @@
                     <img src="{% static 'books/image/default_user.png' %}" class="card-img-top" alt="...">
                 </div>
             </div>
-            
-            
-            
             {% endif %}
+            
             <div class="d-flex justify-content-right"> 
-            <table class="table">
-                <tbody>
-                    <tr>
-                        <th scope="row">Username</th>
-                        <td>{{user.4}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">First Name</th>
-                        <td>{{user.5}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Last Name</th>
-                        <td>{{user.6}}</td> 
-                    </tr>
-                    <tr>
-                        <th scope="row">E-mail</th>
-                        <td>{{user.7}}</td>
-                    </tr>
-                </tbody>
-            </table>
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Username</th>
+                            <td>{{ user.4 }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">First Name</th>
+                            <td>{{ user.5 }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Last Name</th>
+                            <td>{{ user.6 }}</td> 
+                        </tr>
+                        <tr>
+                            <th scope="row">E-mail</th>
+                            <td>{{ user.7 }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+            
             <a href="{% url 'update_profile' user.0 %}" class="btn btn-primary" type="submit">Edit</a>
         </form>
     </div>
 </div>
 {% endfor %}
-
 {% endblock content %}

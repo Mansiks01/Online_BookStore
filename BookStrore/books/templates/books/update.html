@@ -21,17 +21,25 @@
         </div>
 
         <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="{{ user.first_name }}" aria-label="First Name" name="first_name">
+            <input type="text" class="form-control" placeholder="First Name" aria-label="First Name" name="first_name" value="{{ user.first_name }}">
 
-            <span class="input-group-text">@first_name/last_name</span>
-            <input type="text" class="form-control" placeholder="{{ user.last_name }}" aria-label="Last Name" name="last_name">
-
+            <span class="input-group-text">@</span>
+            <input type="text" class="form-control" placeholder="Last Name" aria-label="Last Name" name="last_name" value="{{ user.last_name }}">
         </div>
 
         <div class="input-group mb-3">
-            <span class="input-group-text">e-mail</span>
-            <input type="email" class="form-control" placeholder="{{ user.email }}" aria-label="Email" aria-describedby="basic-addon1" name="email">
+            <span class="input-group-text">E-mail</span>
+            <input type="email" class="form-control" placeholder="{{ user.email }}" aria-label="Email" aria-describedby="basic-addon1" name="email" value="{{ user.email }}">
+        </div>
 
+        <!-- Display current profile image -->
+        <div class="mb-3">
+            <p>Current Profile Image:</p>
+            {% if user.profile_image %}
+                <img src="{{ user.profile_image.url }}" alt="Current Profile Image" class="img-thumbnail" style="max-width: 200px;">
+            {% else %}
+                <p>No current profile image.</p>
+            {% endif %}
         </div>
 
         <div class="input-group mb-3">

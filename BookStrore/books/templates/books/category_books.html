@@ -3,12 +3,14 @@
 
 {% block content %}
 <div class="alert alert-primary alert-dismissible fade show" role="alert">
+    <!-- Display a welcome message with the user's name -->
     <strong>Welcome,</strong> {{ request.user }}
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 <br><br>
 
 <div>
+    <!-- Display the category name -->
     <h2 style="color: black; text-align: center">{{ category.name }}</h2>
     <div class="container">
         <div class="row justify-content-right">
@@ -20,12 +22,13 @@
                         <h5 class="card-title">{{ book.title }}</h5>
                         <p class="card-text">Rs. {{ book.price }}</p>                                
                         <hr>
+                        <!-- Link to book details -->
                         <a href="{% url 'details' slug=book.slug %}" style="float:left" class="btn btn-primary"><i class="fa-solid fa-circle-info"></i>Details</a>
+                        <!-- Button to add book to cart -->
                         <a href="#" class="btn btn-secondary add-to-cart" data-book-id="{{ book.id }}" style="float:right">
                             <i class="fa-solid fa-cart-shopping"></i> Add to Cart
                         </a>                            
                     </div>
-                    
                 </div>
             </div>
             {% endfor %}

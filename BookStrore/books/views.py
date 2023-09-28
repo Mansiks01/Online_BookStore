@@ -1,23 +1,25 @@
-from django.shortcuts import render ,redirect,get_object_or_404
-from django.contrib.auth.models import User
+import re
+import uuid
+import mysql.connector
+from django.db.models import Q
+from datetime import timedelta
+from django.utils import timezone
+from django.db.models import Sum,F
 from django.contrib import messages
+from django.contrib.auth.models import User
+from django.core.paginator import Paginator
+from .helpers import send_forget_password_mail
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from .models import Category, Book,Profile,Cart, Cartitems
-from django.core.paginator import Paginator
-from django.http import JsonResponse
-import uuid
-from django.db.models import Sum,F
-from .helpers import send_forget_password_mail
 from django.http import HttpResponseRedirect,HttpResponse
-from django.utils import timezone
-from datetime import timedelta
-import mysql.connector
-import re
-from django.db.models import Q
+from django.shortcuts import render ,redirect,get_object_or_404
 
 path = 'my.cnf'
 # Create your views here.
+
+
+#User Login related details
 def login_page(request):
     if request.method == "POST":
         username = request.POST.get('username')
@@ -92,116 +94,6 @@ def register(request):
             return redirect('/register/')
     return render(request,'books/register.html')
 
-@login_required(login_url='/')
-def home(request):
-    categories = Category.objects.all()
-    books_by_category = {}
-    
-    search = request.GET.get('search')        
-
-    for category in categories:
-        books = Book.objects.filter(category=category)[:4]
-        if search:
-            books = Book.objects.filter(
-            Q(title__icontains=search) | Q(author__icontains=search), category=category) 
-        books_by_category[category] = books
-    
-    return render(request, 'books/home.html', {'books_by_category': books_by_category})
-
-def details(request, slug):
-    # Use get_object_or_404 to retrieve the book object by slug or return a 404 page if not found
-    book = get_object_or_404(Book, slug=slug)
-
-    return render(request, 'books/details.html', {'book': book})
-
-
-def profile(request, slug):
-    profile_detail = None  
-    
-    try:
-        connection = mysql.connector.connect(option_files=path)
-        if connection.is_connected():
-            cursor = connection.cursor()
-            query = f"select * from auth_user where username = %s;"
-            cursor.execute(query, (slug,))
-            profile_detail = cursor.fetchall()
-            
-    except mysql.connector.Error as e:
-        print("Error:", e)
-    finally:
-        if connection.is_connected():
-            cursor.close()
-            connection.close()
-    
-    return render(request, 'books/profile.html', {'profile_detail': profile_detail})
-
-
-def update_profile(request, id):
-    user = User.objects.get(id=id)
-    if request.method == 'POST':
-            username = request.POST.get('user_name')
-            firstname = request.POST.get('first_name')
-            lastname = request.POST.get('last_name')
-            email = request.POST.get('email')
-            image = request.FILES.get('image')
-
-            # Update user fields
-            if username:
-                user.username = username
-            if firstname:
-                user.first_name = firstname
-            if lastname:
-                user.last_name = lastname
-            if email:    
-                user.email = email
-            if image:
-                user.image = image
-
-            user.save()
-            print("Changes saved")
-            slug = User.objects.filter(id=id).values('username').first()
-            if slug:
-                username_str = slug['username']
-
-            return redirect('profile', slug=username_str)
-            
-    
-
-    context = {'user': user}  # Pass the user object to the template
-    return render(request, 'books/update.html', context)
-
-
-def category_books(request, category_slug):
-    category = Category.objects.get(genre=category_slug)
-    all_books = Book.objects.filter(category=category)
-
-    paginator = Paginator(all_books,2)
-    page_number = request.GET.get('page')
-    books = paginator.get_page(page_number)
-
-    return render(request, 'books/category_books.html', {'category': category, 'books': books})
-
-
-
-def add_to_cart(request, id):
-    book = get_object_or_404(Book, id=id)
-    quantity = int(request.POST.get('quantity', 1))     
-    cart, created = Cart.objects.get_or_create(user=request.user)    
-    cart_item, created = Cartitems.objects.get_or_create(cart=cart, product=book)
-    if not created:
-        cart_item.quantity += quantity
-        cart_item.save()
-
-    messages.success(request, f'Added {quantity} item(s) of {book.title} to your cart.')
-    cart_item.save()
-    
-    return redirect('cart')
-   
-
-    
-
-
-
 def change_password(request,token):
     context ={}
     password_pattern = r'^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{8,20}$'
@@ -264,6 +156,130 @@ def forget_password(request):
     except Exception as e:
         print(e)    
     return render(request, 'books/forget_password.html')
+
+
+
+
+
+
+
+
+#home page and related functions
+@login_required(login_url='/')
+def home(request):
+    categories = Category.objects.all()
+    books_by_category = {}
+    
+    search = request.GET.get('search')        
+
+    for category in categories:
+        books = Book.objects.filter(category=category)[:4]
+        if search:
+            books = Book.objects.filter(
+            Q(title__icontains=search) | Q(author__icontains=search), category=category) 
+        books_by_category[category] = books
+    
+    return render(request, 'books/home.html', {'books_by_category': books_by_category})
+
+def details(request, slug):
+    # Use get_object_or_404 to retrieve the book object by slug or return a 404 page if not found
+    book = get_object_or_404(Book, slug=slug)
+
+    return render(request, 'books/details.html', {'book': book})
+
+def category_books(request, category_slug):
+    category = Category.objects.get(genre=category_slug)
+    all_books = Book.objects.filter(category=category)
+
+    paginator = Paginator(all_books,2)
+    page_number = request.GET.get('page')
+    books = paginator.get_page(page_number)
+
+    return render(request, 'books/category_books.html', {'category': category, 'books': books})
+
+
+
+
+
+
+
+
+#User related functions
+def profile(request, slug):
+    profile_detail = None  
+    
+    try:
+        connection = mysql.connector.connect(option_files=path)
+        if connection.is_connected():
+            cursor = connection.cursor()
+            query = f"select * from auth_user where username = %s;"
+            cursor.execute(query, (slug,))
+            profile_detail = cursor.fetchall()
+            
+    except mysql.connector.Error as e:
+        print("Error:", e)
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
+    
+    return render(request, 'books/profile.html', {'profile_detail': profile_detail})
+
+
+def update_profile(request, id):
+    user = User.objects.get(id=id)
+    if request.method == 'POST':
+            username = request.POST.get('user_name')
+            firstname = request.POST.get('first_name')
+            lastname = request.POST.get('last_name')
+            email = request.POST.get('email')
+            image = request.FILES.get('image')
+
+            # Update user fields
+            if username:
+                user.username = username
+            if firstname:
+                user.first_name = firstname
+            if lastname:
+                user.last_name = lastname
+            if email:    
+                user.email = email
+            if image:
+                user.image = image
+
+            user.save()
+            print("Changes saved")
+            slug = User.objects.filter(id=id).values('username').first()
+            if slug:
+                username_str = slug['username']
+
+            return redirect('profile', slug=username_str)
+            
+    
+
+    context = {'user': user}  # Pass the user object to the template
+    return render(request, 'books/update.html', context)
+
+
+
+
+
+
+
+#cart related functions
+def add_to_cart(request, id):
+    book = get_object_or_404(Book, id=id)
+    quantity = int(request.POST.get('quantity', 1))     
+    cart, created = Cart.objects.get_or_create(user=request.user)    
+    cart_item, created = Cartitems.objects.get_or_create(cart=cart, product=book)
+    if not created:
+        cart_item.quantity += quantity
+        cart_item.save()
+
+    messages.success(request, f'Added {quantity} item(s) of {book.title} to your cart.')
+    cart_item.save()
+    
+    return redirect('cart')
 
 
 def cart(request): 
@@ -331,19 +347,4 @@ def make_payment(request):
             messages.error(request, 'Payment failed. Please try again.')
             return HttpResponse('Erro')
 
-    # return render(request, 'books/make_payment.html', {'total_price': total_price})
 
-
-# def search_results(request):
-#     query = request.GET.get('q')
-#     category = request.GET.get('category')
-#     results = []
-#     if query:
-#         book_query = Q(title__icontains=query) | Q(author__icontains=query)
-        
-#         if category:
-#             book_query &= Q(category__genre__icontains=category)
-
-#         results = Book.objects.filter(book_query)
-
-#     return render(request, 'books/search_results.html', {'results': results})

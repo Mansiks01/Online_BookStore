@@ -1,45 +1,37 @@
 {% extends 'books/base.html' %}
-{% block title %}login page{% endblock title %}
+{% block title %}Login Page{% endblock title %}
 {% block content %}
 <style>
+    /* CSS styles can be added here */
     div {
-        align:center;
+        text-align: center; /* Center align the text */
     }
 
-    
-    .container-form {        
+    .container-form {
         border: 1px solid;
-
     }
-   
 </style>
 
-<div class="container mt-5">    
-    
-    <form class="col-6 mx-auto card p-3 shadow-lg" method="post" enctype="multipart/form-data" >
+<div class="container mt-5">
+    <form class="col-6 mx-auto card p-3 shadow-lg" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <h1 align="center"> Login Page !!!!</h1>
-        
+        <h1 align="center">Login Page!!!</h1>
+
         {% if messages %}
         {{ message.tags }}
+        <!-- Display info messages -->
         <div class="alert alert-info" role="alert">
             {% for message in messages %}
             {{ message }}
             {% endfor %}
-          </div>
-         
+        </div>
         {% endif %}
-        
-        
-        
-        
+
         <div class="input-group mb-3">
             <span class="input-group-text">@</span>
             <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" name="username" required>
         </div>
-        
-        
-        
+
         <label for="inputPassword5" class="form-label">Password</label>
         <input type="password" id="inputPassword5" class="form-control" aria-labelledby="passwordHelpBlock" name="password" required>
         <div id="passwordHelpBlock" class="form-text">
@@ -50,16 +42,14 @@
             <label class="form-check-label" for="rememberMe">
                 Remember Me
             </label>
-        </div>        
-                    
-        
-        <br>
-        <a href="forget_password/" style="text-align:center">Forgot password?</a>   
-        <a href="register/" style="text-align:center" >Didn't have account?</a>
-        <button type="submit" class="btn btn-outline-secondary" >login</button>
-    </form>
-  
-</div>
+        </div>
 
+        <br>
+        <!-- Links for forgot password and registration -->
+        <a href="forget_password/" style="text-align:center">Forgot password?</a>
+        <a href="register/" style="text-align:center">Don't have an account?</a>
+        <button type="submit" class="btn btn-outline-secondary">Login</button>
+    </form>
+</div>
 
 {% endblock content %}
