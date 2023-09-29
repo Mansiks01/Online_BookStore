@@ -21,8 +21,84 @@
                 <h2>{{ book.author }}</h2>
                 <p>Price: Rs. {{ book.price }}</p>
                 <p>{{ book.description }}</p>
+                    <!-- Form for adding to cart -->
+                  <!-- Form for adding to cart -->
+                  <form method="post" action="{% url 'add_to_cart' book.id %}">
+                    {% csrf_token %}
+                    <div class="justify-content-right">
+                        <div class="input-group hidden-quantity-input " style="display: none; max-width: 9rem;">
+                            <button class="btn btn-outline-dark minus-quantity" type="button" {% if book.available_quantity == 0 %}disabled{% endif %}><i class="fa-solid fa-minus"></i></button>
+                            <input name='quantity' type="number" class="form-control quantity-input" value="1" {% if book.available_quantity == 0 %}disabled{% endif %}>
+                            <button class="btn btn-outline-dark plus-quantity" type="button" {% if book.available_quantity == 0 %}disabled{% endif %}><i class="fa-solid fa-plus"></i></button>
+                            <hr>
+                            <button class="btn btn-" type="submit" {% if book.available_quantity == 0 %}disabled{% endif %}><i class="fa-solid fa-cart-shopping" style="margin-right: 5px;"></i> Add</button>
+                        </div>
+                    </div>
+                </form>
+                <!-- Button to add items to cart -->
+                <a class="btn btn-secondary add-to-cart {% if book.available_quantity == 0 %}disabled{% endif %}" data-book-id="{{ book.id }}" style="float:right;" {% if book.available_quantity == 0 %}disabled{% endif %}>
+                    Add <i class="fa-solid fa-plus"></i>
+                </a>
+           
+               
             </div>
+             
         </div>
     </div>
 </div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- JavaScript for managing quantity input and buttons -->
+<script>
+    $(document).ready(function() {
+        // Listen for clicks on the visible "Add" button within each card
+        $('.add-to-cart').on('click', function(e) {
+            e.preventDefault();
+    
+            // Get the relevant card's hidden quantity input field and button
+            var hiddenInputContainer = $(this).closest('.shadow-lg').find('.hidden-quantity-input');
+    
+            // Toggle the visibility of the hidden input field and buttons
+            hiddenInputContainer.toggle();
+    
+            // Toggle the visibility of the visible "Add" button
+            $(this).toggle();
+        });
+    
+        // Handle the "+" and "-" buttons for quantity
+        $(document).on('click', '.plus-quantity', function() {
+            var quantityInput = $(this).siblings('.quantity-input');
+            var quantity = parseInt(quantityInput.val());
+            quantityInput.val(quantity + 1);
+        });
+    
+        $(document).on('click', '.minus-quantity', function() {
+            var quantityInput = $(this).siblings('.quantity-input');
+            var quantity = parseInt(quantityInput.val());
+            if (quantity > 0) {
+                quantityInput.val(quantity - 1);
+            }
+    
+            // If the quantity becomes 0, hide the "Add-Minus" button and show the specific "Add" button
+            if (quantityInput.val() === '0') {
+                $(this).closest('.hidden-quantity-input').hide();
+                $(this).closest('.row').find('.add-to-cart').show();
+            }
+        });
+    
+        // Listen for changes to the quantity input fields
+        $('.quantity-input').on('change', function() {
+            var quantity = parseInt($(this).val());
+    
+            // If the quantity is zero, hide the input field and show the specific "Add" button
+            if (quantity === 0) {
+                $(this).closest('.hidden-quantity-input').hide();
+                $(this).closest('.row').find('.add-to-cart').show();
+            }
+        });
+    });
+    
+</script>
 {% endblock content %}

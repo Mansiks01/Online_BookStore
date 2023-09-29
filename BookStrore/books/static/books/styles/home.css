@@ -3,3 +3,11 @@
     padding: 10px; /* Add padding to create some space between the border and content */
     margin-bottom: 20px; /* Add margin to separate each book card */
 }
+
+
+.custom-disabled-link {
+    pointer-events: none; /* Disable pointer events to make it unclickable */
+    color: gray; /* Change text color to indicate it's disabled */
+    text-decoration: none; /* Remove underline */
+    cursor: not-allowed; /* Change cursor to indicate it's not clickable */
+}

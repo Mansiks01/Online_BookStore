@@ -34,11 +34,10 @@
 
         <!-- Display current profile image -->
         <div class="mb-3">
-            <p>Current Profile Image:</p>
+            
             {% if user.profile_image %}
                 <img src="{{ user.profile_image.url }}" alt="Current Profile Image" class="img-thumbnail" style="max-width: 200px;">
-            {% else %}
-                <p>No current profile image.</p>
+            
             {% endif %}
         </div>
 

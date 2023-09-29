@@ -25,7 +25,7 @@
 <div>    
     <h2 style="color: black; text-align: center">{{ genre }}</h2>
     <!-- Link to see all books in the category -->
-    <a href="{% url 'category_books' category_slug=genre|slugify %}" class="btn btn-primary float-right"><i class="fa-solid fa-eye"></i> See All</a>
+    <a href="{% url 'category_books' category_slug=genre|slugify %}" class="btn btn-primary float-right"><i class="fa-solid fa-eye"style="margin-right: 5px;"></i> See All</a>
     
     <!-- Carousel for displaying books -->
     <div id="carouselExampleControls_{{ genre }}" class="carousel slide" data-bs-ride="carousel">
@@ -37,8 +37,8 @@
                             <div class="card book-card" style="width: 18rem;height:33rem;position: relative;">
                                 {% if book.available_quantity == 0 %}
                                     <!-- Display "Limited Stock" for books with zero quantity -->
-                                    <button class="btn btn-warning btn-limited-stock" style="position: absolute; top: 0; right: 0;">Limited Stock</button>
-                                {% elif book.available_quantity < 15 %}
+                                    <button class="btn btn-danger btn-limited-stock" style="position: absolute; top: 0; right: 0;">Out of Stock</button>
+                                {% elif book.available_quantity <= 15 %}
                                     <!-- Display "Limited Stock" for books with low quantity -->
                                     <button class="btn btn-warning btn-limited-stock" style="position: absolute; top: 0; right: 0;">Limited Stock</button>
                                 {% endif %}
@@ -54,10 +54,10 @@
                                     <p class="card-text">Author: {{ book.author }}</p>
                                     <p class="card-text">Price: Rs. {{ book.price }}</p>
 
-                                    {% if book.available_quantity > 0 %}
+                                    {% if book.available_quantity >= 0 %}
                                         <hr>
                                         <!-- Link to book details -->
-                                        <a href="{% url 'details' slug=book.slug %}" style="float:left" class="btn btn-primary"><i class="fa-solid fa-circle-info"></i> Details</a>
+                                        <a href="{% url 'details' slug=book.slug %}" style="float:left" class="btn btn-primary"><i class="fa-solid fa-circle-info"style="margin-right: 5px;"></i> Details</a>
                                         
                                         <!-- Form for adding to cart -->
                                         <form method="post" action="{% url 'add_to_cart' book.id %}">
@@ -68,12 +68,12 @@
                                                     <input name='quantity' type="number" class="form-control quantity-input" value="1" {% if book.available_quantity == 0 %}disabled{% endif %}>
                                                     <button class="btn btn-outline-dark plus-quantity" type="button" {% if book.available_quantity == 0 %}disabled{% endif %}><i class="fa-solid fa-plus"></i></button>
                                                     <hr>
-                                                    <button class="btn btn-" type="submit"{% if book.available_quantity == 0 %}disabled{% endif %}><i class="fa-solid fa-cart-shopping"></i> Add</button>
+                                                    <button class="btn btn-" type="submit" {% if book.available_quantity == 0 %}disabled{% endif %}><i class="fa-solid fa-cart-shopping" style="margin-right: 5px;"></i> Add</button>
                                                 </div>
                                             </div>
                                         </form>
                                         <!-- Button to add items to cart -->
-                                        <a class="btn btn-secondary add-to-cart" data-book-id="{{ book.id }}" style="float:right;"{% if book.available_quantity == 0 %}disabled{% endif %}>
+                                        <a class="btn btn-secondary add-to-cart {% if book.available_quantity == 0 %}disabled{% endif %}" data-book-id="{{ book.id }}" style="float:right;" {% if book.available_quantity == 0 %}disabled{% endif %}>
                                             Add <i class="fa-solid fa-plus"></i>
                                         </a>
                                     {% endif %}

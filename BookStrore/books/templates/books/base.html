@@ -24,7 +24,10 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/home/">Logo</a>  
+            <a class="navbar-brand" href="/home/">
+                <img src="{% static 'books/image/Logo.png' %}" alt="Logo" style="width: 3rem; height: 3rem; border-radius: 50%;">
+            </a>
+                  
 
             <!-- Check if the user is authenticated -->
             {% if request.user.is_authenticated %}            
@@ -32,37 +35,31 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <!-- Dropdown Menu for Sorting -->
-                    <li class="nav-item dropdown dropdown-hover">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Sort By
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#">Author</a></li>
-                            <li><a class="dropdown-item" href="#">Category</a></li>
-                            <li><a class="dropdown-item" href="#">Price</a></li>
-                        </ul>
-                    </li>
-                    <!-- Dropdown Menu for Ordering -->
-                    <li class="nav-item dropdown dropdown-hover" >
-                        <a class="nav-link dropdown-toggle" href="#"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Order by 
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#">Ascending</a></li>
-                            <li><a class="dropdown-item" href="#">Descending</a></li>
-                        </ul>
-                    </li>
-                    
+                <li class="nav-item dropdown dropdown-hover">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Filter
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="?sort_by=title&order_by=asc">Title ⇡</a></li>
+                        <li><a class="dropdown-item" href="?sort_by=title&order_by=desc">Title ↓</a></li>
+                        <li><a class="dropdown-item" href="?sort_by=autho&order_by=ascr">Author ⇡</a></li>
+                        <li><a class="dropdown-item" href="?sort_by=author&order_by=desc">Author ↓</a></li>
+                        <li><a class="dropdown-item" href="?sort_by=price&order_by=asc">Price ⇡</a></li>
+                        <li><a class="dropdown-item" href="?sort_by=price&order_by=desc">Price ↓</a></li>
+
+                    </ul>
+                </li>
+                 
                     <!-- User Settings Dropdown -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Settings
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="{% url 'profile' slug=request.user %}">Profile</a></li>
-                            <li><a class="dropdown-item" href="/forget_password/">Change Password</a></li>
+                            <li><a class="dropdown-item" href="{% url 'profile' slug=request.user %}"><i class="fa-solid fa-user"style="margin-right: 5px;"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="/forget_password/"><i class="fa-solid fa-key"style="margin-right: 5px;"></i>Change Password</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/logout/">Logout</a></li>
+                            <li><a class="dropdown-item" href="/logout/"><i class="fa-solid fa-right-from-bracket"style="margin-right: 5px;"></i>Logout</a></li>
                         </ul>
                     </li> 
                     <!-- Cart Icon -->

@@ -123,7 +123,7 @@ def change_password(request,token):
                 profile_obj.forget_password_token = None 
                 profile_obj.token_expiration_time = None
                 profile_obj.save()
-                return redirect('/login/')
+                return redirect('/')
         else:
                 messages.error(request, 'The password reset link has expired.')
                 return redirect('/forget_password/')
@@ -169,17 +169,33 @@ def forget_password(request):
 def home(request):
     categories = Category.objects.all()
     books_by_category = {}
-    
-    search = request.GET.get('search')        
+
+    # Get the search query from the request
+    search = request.GET.get('search')
+
+    # Get the sorting and ordering parameters from the request
+    sort_by = request.GET.get('sort_by')
+    order_by = request.GET.get('order_by')
 
     for category in categories:
-        books = Book.objects.filter(category=category)[:4]
+        books = Book.objects.filter(category=category)
+
+        # Apply filtering based on the search query
         if search:
-            books = Book.objects.filter(
-            Q(title__icontains=search) | Q(author__icontains=search), category=category) 
-        books_by_category[category] = books
-    
+            books = books.filter(Q(title__icontains=search) | Q(author__icontains=search))
+
+        # Apply sorting and ordering
+        if sort_by:
+            if order_by == 'asc':
+                books = books.order_by(sort_by)
+            elif order_by == 'desc':
+                books = books.order_by(f'-{sort_by}')
+
+        # Store the filtered and sorted books in the dictionary
+        books_by_category[category] = books[:4]
+
     return render(request, 'books/home.html', {'books_by_category': books_by_category})
+
 
 def details(request, slug):
     # Use get_object_or_404 to retrieve the book object by slug or return a 404 page if not found
