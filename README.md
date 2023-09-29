@@ -83,3 +83,4 @@ This is a Django-based web application for an online bookstore. It allows users 
  ![Detail](https://github.com/Mansiks01/Online_BookStore/blob/main/Screenshots/add%20to%20cart%20option.png)
  ![Detail](https://github.com/Mansiks01/Online_BookStore/blob/main/Screenshots/empty%20cart.png)
  ![Detail](https://github.com/Mansiks01/Online_BookStore/blob/main/Screenshots/forget%20password.png)
+ ![Detail](https://github.com/Mansiks01/Online_BookStore/blob/main/Screenshots/Cart%20page.png)
