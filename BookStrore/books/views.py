@@ -361,6 +361,6 @@ def make_payment(request):
 
         except Exception as e:
             messages.error(request, 'Payment failed. Please try again.')
-            return HttpResponse('Erro')
+            return HttpResponse('Error')
 
 
