@@ -2,11 +2,12 @@
 {% load static %}
 
 {% block content %}
-<div class="justify-content-center">
+<br><br><br><br><br><br>
+<div class="justify-content-center p-3 shadow-lg">
     <div class="container">
         <div class="row">
             <!-- Left Column (Image) -->
-            <div class="col-md-6">
+            <div class="col-md-6 mx-auto text-center">
                 {% if book.book_image %}
                     <img src="{{ book.book_image.url }}" class="card-img-top" alt="..." style="height:20rem; width:15rem;">
                 {% else %}
@@ -15,7 +16,7 @@
             </div>
             
             <!-- Right Column (Description and Buttons) -->
-            <div class="col-md-6">
+            <div class="col-md-6 mx-auto text-center">
                 <h1>{{ book.title }}</h1>
                 <h2>{{ book.author }}</h2>
                 <p>Price: Rs. {{ book.price }}</p>

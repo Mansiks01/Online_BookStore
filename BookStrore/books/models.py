@@ -1,5 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
+
+
+
+# class CustomUser(AbstractUser):
+#     profile_image = models.ImageField(upload_to='profile_images/', null=True, blank=True)
 
 # Category model for book genres
 class Category(models.Model):

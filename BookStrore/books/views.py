@@ -154,7 +154,7 @@ def forget_password(request):
             return redirect('/forget_password/')
 
     except Exception as e:
-        print(e)    
+        messages.success(request, e)   
     return render(request, 'books/forget_password.html')
 
 
@@ -191,7 +191,7 @@ def category_books(request, category_slug):
     category = Category.objects.get(genre=category_slug)
     all_books = Book.objects.filter(category=category)
 
-    paginator = Paginator(all_books,2)
+    paginator = Paginator(all_books,4)
     page_number = request.GET.get('page')
     books = paginator.get_page(page_number)
 
@@ -334,7 +334,7 @@ def make_payment(request):
                 # Decrease the available quantity of books
                 for cart_item in cart_items:
                     book = cart_item.product
-                    book.available_quantity -= 1
+                    book.available_quantity -= cart_item.quantity
                     book.save()
 
             # Clear the cart

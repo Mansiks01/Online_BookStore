@@ -141,5 +141,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'bookstrore.mansi@gmail.com'
 EMAIL_HOST_PASSWORD = 'ugyrtkgxubhssstp'
 
+# AUTH_USER_MODEL = 'models.CustomUser'
+
 
 LOGIN_URL = '/'

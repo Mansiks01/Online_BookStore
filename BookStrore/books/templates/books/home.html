@@ -64,16 +64,16 @@
                                             {% csrf_token %}
                                             <div class="justify-content-right">
                                                 <div class="input-group hidden-quantity-input " style="display: none; max-width: 9rem;">
-                                                    <button class="btn btn-outline-dark minus-quantity" type="button"><i class="fa-solid fa-minus"></i></button>
-                                                    <input name='quantity' type="number" class="form-control quantity-input" value="1">
-                                                    <button class="btn btn-outline-dark plus-quantity" type="button"><i class="fa-solid fa-plus"></i></button>
+                                                    <button class="btn btn-outline-dark minus-quantity" type="button" {% if book.available_quantity == 0 %}disabled{% endif %}><i class="fa-solid fa-minus"></i></button>
+                                                    <input name='quantity' type="number" class="form-control quantity-input" value="1" {% if book.available_quantity == 0 %}disabled{% endif %}>
+                                                    <button class="btn btn-outline-dark plus-quantity" type="button" {% if book.available_quantity == 0 %}disabled{% endif %}><i class="fa-solid fa-plus"></i></button>
                                                     <hr>
-                                                    <button class="btn btn-" type="submit"><i class="fa-solid fa-cart-shopping"></i> Add</button>
+                                                    <button class="btn btn-" type="submit"{% if book.available_quantity == 0 %}disabled{% endif %}><i class="fa-solid fa-cart-shopping"></i> Add</button>
                                                 </div>
                                             </div>
                                         </form>
                                         <!-- Button to add items to cart -->
-                                        <a class="btn btn-secondary add-to-cart" data-book-id="{{ book.id }}" style="float:right;">
+                                        <a class="btn btn-secondary add-to-cart" data-book-id="{{ book.id }}" style="float:right;"{% if book.available_quantity == 0 %}disabled{% endif %}>
                                             Add <i class="fa-solid fa-plus"></i>
                                         </a>
                                     {% endif %}
