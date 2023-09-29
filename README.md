@@ -61,3 +61,10 @@ This is a Django-based web application for an online bookstore. It allows users 
     python manage.py runserver
 
 4. Open a web browser and navigate to http://localhost:8000 to access the application.   
+
+5. In Settings.py :
+    Fill:   EMAIL_HOST_USER = ''
+            EMAIL_HOST_PASSWORD = '' 
+    these with your email and password
+6. In my.cnf :
+    Fill name of database, root and password             
