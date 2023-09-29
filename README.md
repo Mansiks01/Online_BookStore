@@ -1,27 +1,24 @@
 # Online_BookStore
 
-
-![Bookstore]
-
 This is a Django-based web application for an online bookstore. It allows users to browse, search, and purchase books online. The project includes features such as user authentication, shopping cart, and a user profile system.
+
 
 ## Table of Contents
 
 - [Features](#features)
 - [Installation](#installation)
-- [Use](#use)
-
+- [Usage](#usage)
+- [Configuration](#configuration)
 
 ## Features
 
-- User Registration and Authentication
-- Browse Books by Category
-- Search Books by Title or Author
-- Add Books to the Shopping Cart
-- Change User Password
-- User Profile Management
-- Admin Dashboard for Managing Books and Categories
-- Responsive Design for Mobile and Desktop
+- **User Registration and Authentication**: Users can register and log in securely.
+- **Browse Books by Category**: Books are categorized for easy browsing.
+- **Search Books**: Users can search for books by title or author.
+- **Shopping Cart**: Users can add books to their shopping cart.
+- **User Profile Management**: Users can manage their profiles.
+- **Admin Dashboard**: Admins can manage books and categories.
+- **Responsive Design**: The app is responsive for mobile and desktop.
 
 ## Installation
 
@@ -29,6 +26,7 @@ This is a Django-based web application for an online bookstore. It allows users 
 
    ```shell
    git clone https://github.com/Mansiks01/Online_BookStore.git
+
 
 
 2. Navigate to the project directory:
@@ -39,16 +37,20 @@ This is a Django-based web application for an online bookstore. It allows users 
     python -m venv venv
 
 4.  Activate the virtual environment:
-
-    On Windows:
+    On Windows
+    ```shell
     venv\Scripts\activate
-    On macOS and Linux:
+    
+ 5. On macOS and Linux:
+    ```shell
     source venv/bin/activate
 
-5.  Install the project dependencies:
+6. Install the project dependencies:
+      ```shell
     pip install -r requirements.txt
 
-## Use
+
+## Usage
 1.  Apply database migrations:
     python manage.py migrate
 
@@ -62,9 +64,12 @@ This is a Django-based web application for an online bookstore. It allows users 
 
 4. Open a web browser and navigate to http://localhost:8000 to access the application.   
 
-5. In Settings.py :
+
+## Configuration
+1. In Settings.py :
     Fill:   EMAIL_HOST_USER = ''
             EMAIL_HOST_PASSWORD = '' 
     these with your email and password
-6. In my.cnf :
-    Fill name of database, root and password             
+2. In my.cnf :
+    Fill:
+    name of database, user and password             
