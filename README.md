@@ -2,6 +2,7 @@
 
 This is a Django-based web application for an online bookstore. It allows users to browse, search, and purchase books online. The project includes features such as user authentication, shopping cart, and a user profile system.
 
+![Bookstore](https://github.com/Mansiks01/Online_BookStore/blob/main/Screenshots/Front.png)
 
 ## Table of Contents
 
@@ -9,6 +10,7 @@ This is a Django-based web application for an online bookstore. It allows users 
 - [Installation](#installation)
 - [Usage](#usage)
 - [Configuration](#configuration)
+- [Images](#images)
 
 ## Features
 
@@ -72,4 +74,12 @@ This is a Django-based web application for an online bookstore. It allows users 
     these with your email and password
 2. In my.cnf :
     Fill:
-    name of database, user and password             
+    name of database, user and password
+
+ ## Images
+ ![Detail](https://github.com/Mansiks01/Online_BookStore/blob/main/Screenshots/Detail%20page.png)
+ ![Detail](https://github.com/Mansiks01/Online_BookStore/blob/main/Screenshots/add%20to%20cart%20option.png)
+ ![Detail](https://github.com/Mansiks01/Online_BookStore/blob/main/Screenshots/Pagination.png)
+ ![Detail](https://github.com/Mansiks01/Online_BookStore/blob/main/Screenshots/add%20to%20cart%20option.png)
+ ![Detail](https://github.com/Mansiks01/Online_BookStore/blob/main/Screenshots/empty%20cart.png)
+ ![Detail](https://github.com/Mansiks01/Online_BookStore/blob/main/Screenshots/forget%20password.png)
