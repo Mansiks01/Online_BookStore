@@ -26,7 +26,7 @@
                   <form method="post" action="{% url 'add_to_cart' book.id %}">
                     {% csrf_token %}
                     <div class="justify-content-right">
-                        <div class="input-group hidden-quantity-input " style="display: none; max-width: 9rem;">
+                        <div class="input-group hidden-quantity-input " style="display: none; max-width: 9rem; float:right;">
                             <button class="btn btn-outline-dark minus-quantity" type="button" {% if book.available_quantity == 0 %}disabled{% endif %}><i class="fa-solid fa-minus"></i></button>
                             <input name='quantity' type="number" class="form-control quantity-input" value="1" {% if book.available_quantity == 0 %}disabled{% endif %}>
                             <button class="btn btn-outline-dark plus-quantity" type="button" {% if book.available_quantity == 0 %}disabled{% endif %}><i class="fa-solid fa-plus"></i></button>

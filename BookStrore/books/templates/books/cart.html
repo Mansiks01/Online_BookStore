@@ -18,14 +18,34 @@
     <div class="row justify-content-center">
         {% for books in cart_items %}
         <div class="col-md-4 mb-4 msg">
-            <div class="card" style="width: 100%;">
-                <img src="{% static 'books/image/default.jpg' %}" class="card-img-top" alt="..." style="height: 100%; width: 50%;">
-                <div class="card-body">
+            <div class="card" style="width: 100%; height: 30rem">
+                {% if books.product.book_image %}
+                    <img src="{{ books.product.book_image.url }}" class="card-img-top" alt="..." style="height:15rem">
+                {% else %}
+                    <img src="{% static 'books/image/default.jpg' %}" class="card-img-top" alt="...">
+                {% endif %}
+                <div class="card-body">                               
                     <h5 class="card-title">{{ books }}</h5>
-                    <p class="card-text" style="float:left">{{ books.quantity }}</p>
-                    <p class="card-text" style="float:right">{{ books.product.price }}</p><br>
+                    <p class="card-text" style="float:left">quantity: {{ books.quantity }}</p>
+                    <p class="card-text" style="float:right">price: {{ books.product.price }}</p><br><br>
+                    <p class="card-text" style="float:left">available quantity:{{ books.product.available_quantity }}</p><br>
                     <hr>
-                    <a class="btn btn-danger " type="button" href='{% url "remove_cart" cart_item_id=books.id %}'><i class="fa-solid fa-trash"style="margin-right: 5px;"></i>Delete</a>        
+                    <a class="btn btn-danger " type="button" href="{% url 'remove_cart' cart_item_id=books.id %}" style="float:left"><i class="fa-solid fa-trash"style="margin-right: 5px;"></i>Delete</a> 
+                    <form method="post" action="{% url 'add_to_cart' books.product.id %}">
+                        {% csrf_token %}
+                        <div class="justify-content-right">
+                            <div class="input-group hidden-quantity-input " style="display: none; max-width: 9rem; float:right;" >
+                                <button class="btn btn-outline-dark minus-quantity" type="button" {% if books.available_quantity == 0 %}disabled{% endif %}><i class="fa-solid fa-minus"></i></button>
+                                <input name='quantity' min="1" type="number" class="form-control quantity-input" value="1" max ="{{ books.product.available_quantity }}" {% if books.available_quantity == 0 %}disabled{% endif %}>
+                                <button class="btn btn-outline-dark plus-quantity" type="button" {% if books.available_quantity == 0 %}disabled{% endif %}><i class="fa-solid fa-plus"></i></button>
+                                <hr>
+                                <button class="btn btn-" type="submit" {% if books.available_quantity == 0 %}disabled{% endif %}><i class="fa-solid fa-cart-shopping" style="margin-right: 5px;"></i> Add</button>
+                            </div>
+                        </div>
+                    </form>
+                    <a class="btn btn-secondary add-to-cart {% if books.available_quantity == 0 %}disabled{% endif %}" data-book-id="{{ books.id }}" style="float:right;" {% if books.available_quantity == 0 %}disabled{% endif %}>
+                        Add <i class="fa-solid fa-plus"></i>
+                    </a>       
                 </div>
             </div>
         </div>  
@@ -39,14 +59,74 @@
             </tr>
         </thead>
     </table>
-    <form class="col-6 mx-auto card p-3 shadow-lg" method="post" enctype="multipart/form-data">
+    <form class="col-6 mx-auto card p-3 shadow-lg" method="post" enctype="multipart/form-data" action="{% url 'cart'  %}">
         {% csrf_token %}
-        <button class="btn btn-success" type="submit"><i class="fa-solid fa-money-bill-trend-up"></i>Make payment</button>
+        <button class="btn btn-success" type="submit"><i class="fa-solid fa-money-bill-trend-up" style="margin-right: 5px;"></i>Make payment</button>
     </form>
     {% else %}
     <!-- Display an image when the cart is empty -->
     <img src="{% static 'books/image/empty_cart.png' %}" alt="Empty Cart" style="width: 50%; height: 50%;">
     {% endif %}
 </div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- JavaScript for managing quantity input and buttons -->
+<script>
+$(document).ready(function() {
+    // Listen for clicks on the visible "Add" button within each card
+    $('.add-to-cart').on('click', function(e) {
+        e.preventDefault();
+        
+        // Get the relevant card's hidden quantity input field and button
+        var hiddenInputContainer = $(this).closest('.card').find('.hidden-quantity-input');
+        
+        // Toggle the visibility of the hidden input field and buttons
+        hiddenInputContainer.toggle();
+        
+        // Toggle the visibility of the visible "Add" button
+        $(this).toggle();
+    });
+    
+    // Handle the "+" and "-" buttons for quantity
+    $(document).on('click', '.plus-quantity', function() {
+        var quantityInput = $(this).closest('.hidden-quantity-input').find('.quantity-input');
+        var quantity = parseInt(quantityInput.val());
+        quantityInput.val(quantity + 1);
+        
+        // Show the "Add-Minus" button
+        $(this).closest('.hidden-quantity-input').find('.add-minus-cart').show();
+    });
+    
+    $(document).on('click', '.minus-quantity', function() {
+        var quantityInput = $(this).closest('.hidden-quantity-input').find('.quantity-input');
+        var quantity = parseInt(quantityInput.val());
+        if (quantity > 0) {
+            quantityInput.val(quantity - 1);
+        }
+        
+        // If the quantity becomes 0, hide the "Add-Minus" button and show the "Add" button
+        if (quantityInput.val() === '0') {
+            $(this).closest('.hidden-quantity-input').hide();
+            $(this).closest('.card').find('.add-to-cart').show();
+        }
+    });
+    
+    // Listen for changes to the quantity input fields
+    $('.quantity-input').on('change', function() {
+        var quantity = parseInt($(this).val());
+        
+        // If the quantity is zero, hide the input field and show the "Add" button
+        if (quantity === 0) {
+            $(this).closest('.hidden-quantity-input').hide();
+            $(this).closest('.card').find('.add-to-cart').show();
+        } else {
+            $(this).closest('.card').find('.add-to-cart').hide();
+            $(this).closest('.hidden-quantity-input').find('.add-minus-cart').show();
+        }
+    });
+});
+</script>
 
 {% endblock content %}

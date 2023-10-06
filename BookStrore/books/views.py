@@ -64,35 +64,56 @@ def log_out(request):
     
 
 def register(request):
-    if request.method == "POST" :
-        username = request.POST.get('user_name')
-        email = request.POST.get('email')
-        password= request.POST.get('password')
-        first_name= request.POST.get('first_name')
-        last_name= request.POST.get('last_name')
-        email_pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-        password_pattern = r'^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{8,20}$'
-        user= User.objects.filter(username=username)
-        if user:            
-            messages.error(request,"username already exists")
-            return redirect('/register/')
-        elif User.objects.filter(email = email):
-            messages.error(request,'Already have a account with this e-mail')
-        elif len(username)<2 or len(email)<3 :
-            messages.error(request, "Username too small")
-        elif not re.match(email_pattern, email):
-            messages.error(request, "email not correct") 
-  
-        elif not re.match(password_pattern, password):
-            messages.error(request, "Password pattern is not correct")   
-        else:        
+    try: 
+        if request.method == "POST":
+            username = request.POST.get('username')
+            email = request.POST.get('email')
+            password = request.POST.get('password')
+            first_name = request.POST.get('first_name')
+            last_name = request.POST.get('last_name')
+            email_pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+            password_pattern = r'^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{8,20}$'
+            
+            # Check if a user with the same username already exists
+            if User.objects.filter(username=username).exists():
+                messages.error(request, "Username already exists")
+                return redirect('/register/')
+            
+            # Check if a user with the same email already exists
+            elif username is None:
+                messages.error(request, "Username is missing")
 
-            user = User.objects.create(username=username,email=email,last_name=last_name,first_name=first_name)
-            user.set_password(password)
-            user.save()
-            messages.error(request,"Account created succesfully")
-            return redirect('/register/')
-    return render(request,'books/register.html')
+            elif first_name is None:
+                messages.error(request, "first name is missing")
+                 
+            elif User.objects.filter(email=email).exists():
+                messages.error(request, 'Account with this email already exists')
+            
+            # Check for minimum length requirements for username and email
+            elif len(username) < 2 or len(email) < 3:
+                messages.error(request, "Username or email is too short")
+            
+            # Check if the email format is correct
+            elif not re.match(email_pattern, email):
+                messages.error(request, "Email is not in a valid format")
+            
+            # Check if the password meets the pattern requirements
+            elif not re.match(password_pattern, password):
+                messages.error(request, "Password does not meet requirements")
+            
+            else:
+                # Create a new user
+                user = User.objects.create(username=username, email=email, last_name=last_name, first_name=first_name)
+                user.set_password(password)
+                user.save()
+                messages.success(request, "Account created successfully")
+                return redirect('/register/')
+    except Exception as e:
+        messages.error(request, "Something went wrong")
+        print(e)
+    
+    return render(request, 'books/register.html')
+
 
 def change_password(request,token):
     context ={}
@@ -169,6 +190,7 @@ def forget_password(request):
 def home(request):
     categories = Category.objects.all()
     books_by_category = {}
+    book_found = False  # Add a flag to track if any book was found
 
     # Get the search query from the request
     search = request.GET.get('search')
@@ -183,6 +205,10 @@ def home(request):
         # Apply filtering based on the search query
         if search:
             books = books.filter(Q(title__icontains=search) | Q(author__icontains=search))
+            if books.exists():
+                book_found = True  # Set the flag to True if books are found
+            else:
+                continue  # No books found in this category, move to the next
 
         # Apply sorting and ordering
         if sort_by:
@@ -194,7 +220,12 @@ def home(request):
         # Store the filtered and sorted books in the dictionary
         books_by_category[category] = books[:4]
 
+    # Check if any book was found and display a message accordingly
+    if search and not book_found:
+        messages.success(request, 'Book not found')
+
     return render(request, 'books/home.html', {'books_by_category': books_by_category})
+
 
 
 def details(request, slug):
@@ -284,16 +315,29 @@ def update_profile(request, id):
 
 #cart related functions
 def add_to_cart(request, id):
-    book = get_object_or_404(Book, id=id)
-    quantity = int(request.POST.get('quantity', 1))     
-    cart, created = Cart.objects.get_or_create(user=request.user)    
-    cart_item, created = Cartitems.objects.get_or_create(cart=cart, product=book)
-    if not created:
-        cart_item.quantity += quantity
-        cart_item.save()
+    try : 
+        book = get_object_or_404(Book, id=id)
+        quantity = int(request.POST.get('quantity', 1))     
+        cart, user_created = Cart.objects.get_or_create(user=request.user)    
+        cart_item, created = Cartitems.objects.get_or_create(cart=cart, product=book)        
+        if not created:
+            new_quantity = cart_item.quantity + quantity
+            if new_quantity <= book.available_quantity:
+                cart_item.quantity = new_quantity
+                cart_item.save()
+                messages.success(request, f'Added {quantity} item(s) of {book.title} to your cart.')
 
-    messages.success(request, f'Added {quantity} item(s) of {book.title} to your cart.')
-    cart_item.save()
+            else:
+                messages.warning(request, "Quantity exceeds available book quantity.")                
+
+        else:
+            cart_item.quantity = quantity
+        if cart_item.quantity < 0 :
+            messages.success(request, "Add correct quantity")                
+    except Exception as e :
+             messages.success(request, "Add correct quantity")   
+             print(e) 
+    # cart_item.save()
     
     return redirect('cart')
 
@@ -303,24 +347,24 @@ def cart(request):
     user = request.user
     cart = Cart.objects.get(user=user)
     cart_items = Cartitems.objects.filter(cart__is_paid = False,cart__user = user) 
-    quantity = cart_items
     total_price = cart_items.aggregate(total_price=Sum(F('product__price') * F('quantity')))['total_price']
+    try: 
+        if request.method == 'POST':            
+                    # Update cart items, set is_paid to True
+                    cart.is_paid=True
+                    # Decrease the available quantity of books
+                    for cart_item in cart_items:
+                        book = cart_item.product
+                        quantity = cart_item.quantity
+                        book.available_quantity -= quantity
+                        book.save()
+                # Clear the cart
+                    cart_items.delete()
 
-    if request.method == 'POST':            
-                # Update cart items, set is_paid to True
-                cart.is_paid=True
-
-                # Decrease the available quantity of books
-                for cart_item in cart_items:
-                    book = cart_item.product
-                    book.available_quantity -= 1
-                    book.save()
-            # Clear the cart
-                cart_items.delete()
-
-                messages.success(request, 'Payment successful. Your order has been placed.')
-                return redirect('/home/')
-       
+                    messages.success(request, 'Payment successful. Your order has been placed.')
+                    return redirect('/home/')
+    except Exception as e :
+         messages.success(request,"Something went wrong, try to reduce quantity of book")   
     
     return render(request,'books/cart.html',{'cart_items':cart_items,'total_price': total_price})
 

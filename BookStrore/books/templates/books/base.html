@@ -30,7 +30,7 @@
                   
 
             <!-- Check if the user is authenticated -->
-            {% if request.user.is_authenticated %}            
+            {% if request.path == '/home/' and request.user.is_authenticated %}            
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -68,7 +68,7 @@
                     </li>
                 </ul>
                 <!-- Search Form -->
-                <form class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4" role="search">
+                <form class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4" role="search" >
                     <input class="form-control me-2" name="search" type="search" placeholder="Search" aria-label="Search">
                     <button class="btn btn-outline-success mt-auto" type="submit">Go</button>
                 </form>
